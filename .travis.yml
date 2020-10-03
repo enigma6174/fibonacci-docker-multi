@@ -1,0 +1,30 @@
+sudo: required
+
+services:
+    - docker
+
+# Run test case using Docker.dev file before building production images
+before_install:
+    - docker build -t enigma6174/client-test -f ./client/Dockerfile.dev ./client
+
+# Scrip to run the test suite
+script:
+    - docker run -e CI=true enigma6174/client-test npm run test
+
+# When the test cases are successful run these commands
+after_success:
+
+    # Build one image for each of the Docker files 
+    - docker build -t enigma6174/fibonacci-client ./client
+    - docker build -t enigma6174/fibonacci-server ./server
+    - docker build -t enigma6174/fibonacci-worker ./worker
+    - docker build -t enigma6174/fibonacci-nginx ./nginx
+
+    # Login to Docker
+    - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_ID" --password-stdin
+
+    # Push images to Docker Hub
+    - docker push enigma6174/fibonacci-client
+    - docker push enigma6174/fibonacci-server
+    - docker push enigma6174/fibonacci-worker
+    - docker push enigma6174/fibonacci-nginx
