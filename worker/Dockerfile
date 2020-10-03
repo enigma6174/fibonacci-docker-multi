@@ -5,7 +5,7 @@ FROM node:alpine
 WORKDIR "/app"
 
 # Install dependencies
-COPY ./pagkage.json ./
+COPY ./package.json ./
 RUN npm install
 
 # Copy contents of current directory
